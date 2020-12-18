@@ -1,0 +1,181 @@
+FUNCTION FishArray1D, YP, EMS, RAS, ROG, WAE, nYP, nEMS, nRAS, nROG, nWAE, nGridcell
+;
+;***********TEST ONLY****************************************************************************************
+;PRO FishArray
+;ihour = 15L; 
+;Grid3D = GridCells3D()
+;nGridcell = 77500L
+;TotBenBio = FLTARR(nGridcell) 
+;BottomCell = WHERE(Grid3D[2, *] EQ 20L , BottomCellcount, complement = NonBottomCell, ncomplement = NonBottomCellcount)
+;IF BottomCellcount GT 0. THEN TotBenBio[BottomCell] = RANDOMU(seed, BottomCellcount)*(MAX(6.679) - MIN(0.4431)) + MIN(0.4431)
+;Grid2D = GridCells2D(); FORAGE PARAMETER
+;NewInput = EcoForeInputfiles()
+;NewInput = NewInput[*, 77500L * ihour : 77500L * ihour + 77499L]
+;TotBenBio = TotBenBio + NewInput[8, *]
+;
+;nYP = 100000L
+;nEMS = 100000L;
+;nRAS = 100000L;
+;nROG = 100000L;
+;nWAE = 100000L;
+;NpopYP = 50000000L
+;NpopEMS = 50000000L
+;NpopRAS = 50000000L
+;NpopROG = 50000000L
+;NpopWAE = 50000000L
+;YP = YEPinitial(NpopYP, nYP, TotBenBio, NewInput); FISHARRY PARAMETER
+;EMS = EMSinitial(NpopEMS, nEMS, TotBenBio, NewInput); FISHARRY PARAMETER
+;RAS = RASinitial(NpopRAS, nRAS, TotBenBio, NewInput); FISHARRY PARAMETER
+;ROG = ROGinitial(NpopROG, nROG, TotBenBio, NewInput); FISHARRY PARAMETER
+;WAE = WAEinitial(NpopWAE, nWAE, TotBenBio, NewInput); FISHARRY PARAMETER
+;******************************************************************************************************************************
+
+PRINT, 'FISHPREY BEGINS HERE'
+tstart = SYSTIME(/seconds)
+
+; Creat a fish prey array for potential predators 
+FISHPREY = FLTARR(28L, nGridcell)
+FISHCellIDcount = FLTARR(5L, nGridcell)
+
+;PRINT, 'YP[14, *]', YP[14, *]
+
+; NUMBER OF SUPERINDIVIDUALS, LENGTH, WEIGHT, TOTAL ABUNDANCE AND BIOMASS IN EACH CELL
+; YELLOW PERCH
+FOR ID = 0L, nYP-1L DO BEGIN
+;PRINT, 'YP[14, ID]', YP[14, ID]
+  FISHCellIDcount[0, YP[14, ID]] = FISHCellIDcount[0, YP[14, ID]] + (YP[0, ID] GT 0.); NUMBER OF SIs
+  FISHPREY[0, YP[14, ID]] = FISHPREY[0, YP[14, ID]] + YP[0, ID]; ABUNDANCE
+  FISHPREY[3, YP[14, ID]] = FISHPREY[3, YP[14, ID]] + YP[2, ID] * FISHPREY[0, YP[14, ID]]; BIOMASS
+
+  IF FISHPREY[1, YP[14, ID]] EQ 0. THEN BEGIN; WHEN THE CELL IS EMPTY...
+    FISHPREY[1, YP[14, ID]] = YP[1, ID]; LENGTH
+    FISHPREY[2, YP[14, ID]] = YP[2, ID]; WEIGHT
+  ENDIF
+  IF FISHPREY[1, YP[14, ID]] GT 0. THEN BEGIN; WHEN OTHER SIs ARE ALREADY IN THE CELL...
+    IF (FISHPREY[1, YP[14, ID]] GT YP[1, ID]) THEN BEGIN; WHEN NEW SI IS SMALLER...
+      FISHPREY[1, YP[14, ID]] = YP[1, ID]
+      FISHPREY[2, YP[14, ID]] = YP[2, ID]
+    ENDIF
+    IF (FISHPREY[1, YP[14, ID]] LT YP[1, ID]) THEN BEGIN; WHEN NEW SI IS LARGER...
+      FISHPREY[1, YP[14, ID]] = FISHPREY[1, YP[14, ID]]
+      FISHPREY[2, YP[14, ID]] = FISHPREY[2, YP[14, ID]]   
+    ENDIF
+  ENDIF
+ENDFOR
+print, fishprey[0:5,YP[14, *]]
+; EMERALD SHINER
+FOR ID = 0L, nEMS-1L DO BEGIN
+  FISHCellIDcount[1, EMS[14, ID]] = FISHCellIDcount[1, EMS[14, ID]] + (EMS[0, ID] GT 0.) 
+  FISHPREY[5, EMS[14, ID]] = FISHPREY[5, EMS[14, ID]] + EMS[0, ID]; ABUNDANCE
+  FISHPREY[8, EMS[14, ID]] = FISHPREY[8, EMS[14, ID]] + EMS[2, ID] * FISHPREY[5, EMS[14, ID]]; BIOMASS 
+
+  IF FISHPREY[6, EMS[14, ID]] EQ 0. THEN BEGIN 
+    FISHPREY[6, EMS[14, ID]] = EMS[1, ID];
+    FISHPREY[7, EMS[14, ID]] = EMS[2, ID];
+  ENDIF
+  IF FISHPREY[6, EMS[14, ID]] GT 0. THEN BEGIN
+    IF (FISHPREY[1, EMS[14, ID]] GT EMS[1, ID]) THEN BEGIN
+      FISHPREY[6, EMS[14, ID]] = EMS[1, ID]
+      FISHPREY[7, EMS[14, ID]] = EMS[2, ID]
+   ENDIF
+    IF (FISHPREY[6, EMS[14, ID]] LT EMS[1, ID]) THEN BEGIN
+      FISHPREY[6, EMS[14, ID]] = FISHPREY[6, EMS[14, ID]]
+      FISHPREY[7, EMS[14, ID]] = FISHPREY[7, EMS[14, ID]]   
+    ENDIF
+  ENDIF
+ENDFOR
+; RAINBOW SMELT
+FOR ID = 0L, nRAS-1L DO BEGIN
+  FISHCellIDcount[2, RAS[14, ID]] = FISHCellIDcount[2, RAS[14, ID]] + (RAS[0, ID] GT 0.)
+  FISHPREY[10, RAS[14, ID]] = FISHPREY[10, RAS[14, ID]] + RAS[0, ID]; ABUNDANCE
+  FISHPREY[13, RAS[14, ID]] = FISHPREY[13, RAS[14, ID]] + RAS[2, ID] * FISHPREY[10, RAS[14, ID]]; BIOMASS
+ 
+  IF FISHPREY[11, RAS[14, ID]] EQ 0. THEN BEGIN 
+    FISHPREY[11, RAS[14, ID]] = RAS[1, ID];
+    FISHPREY[12, RAS[14, ID]] = RAS[2, ID];
+  ENDIF
+  IF FISHPREY[11, RAS[14, ID]] GT 0. THEN BEGIN
+    IF (FISHPREY[11, RAS[14, ID]] GT RAS[1, ID]) THEN BEGIN
+      FISHPREY[11, RAS[14, ID]] = RAS[1, ID]
+      FISHPREY[12, RAS[14, ID]] = RAS[2, ID]
+    ENDIF
+    IF (FISHPREY[11, RAS[14, ID]] LT RAS[1, ID]) THEN BEGIN
+      FISHPREY[11, RAS[14, ID]] = FISHPREY[11, RAS[14, ID]]
+      FISHPREY[12, RAS[14, ID]] = FISHPREY[12, RAS[14, ID]]   
+    ENDIF
+  ENDIF
+ENDFOR
+;; ROUND GOBY
+;FOR ID = 0L, nROG-1L DO BEGIN
+;  FISHCellIDcount[3, ROG[14, ID]] = FISHCellIDcount[3, ROG[14, ID]] + (ROG[0, ID] GT 0.)
+;  FISHPREY[15, ROG[14, ID]] = FISHPREY[15, ROG[14, ID]] + ROG[0, ID]; ABUNDANCE
+;  FISHPREY[18, ROG[14, ID]] = FISHPREY[18, ROG[14, ID]] + ROG[2, ID] * FISHPREY[15, ROG[14, ID]]; BIOMASS
+; 
+;  IF FISHPREY[16, ROG[14, ID]] EQ 0. THEN BEGIN 
+;    FISHPREY[16, ROG[14, ID]] = ROG[1, ID];
+;    FISHPREY[17, ROG[14, ID]] = ROG[2, ID];
+;  ENDIF
+;  IF FISHPREY[16, ROG[14, ID]] GT 0. THEN BEGIN
+;    IF (FISHPREY[16, ROG[14, ID]] GT ROG[1, ID]) THEN BEGIN
+;      FISHPREY[16, ROG[14, ID]] = ROG[1, ID]
+;      FISHPREY[17, ROG[14, ID]] = ROG[2, ID]
+;    ENDIF
+;    IF (FISHPREY[16, ROG[14, ID]] LT ROG[1, ID]) THEN BEGIN
+;      FISHPREY[16, ROG[14, ID]] = FISHPREY[16, ROG[14, ID]]
+;      FISHPREY[17, ROG[14, ID]] = FISHPREY[17, ROG[14, ID]]
+;    ENDIF   
+;  ENDIF
+;ENDFOR
+; WALLEYE
+FOR ID = 0L, nWAE-1L DO BEGIN
+  FISHCellIDcount[4, WAE[14, ID]] = FISHCellIDcount[4, WAE[14, ID]] + (WAE[0, ID] GT 0.)
+  FISHPREY[20, WAE[14, ID]] = FISHPREY[20, WAE[14, ID]] + WAE[0, ID]; ABUNDANCE
+  FISHPREY[23, WAE[14, ID]] = FISHPREY[23, WAE[14, ID]] + WAE[2, ID] * FISHPREY[20, WAE[14, ID]]; BIOMASS 
+ 
+  IF FISHPREY[21, WAE[14, ID]] EQ 0. THEN BEGIN 
+    FISHPREY[21, WAE[14, ID]] = WAE[1, ID];
+    FISHPREY[22, WAE[14, ID]] = WAE[2, ID];
+  ENDIF
+  IF FISHPREY[21, WAE[14, ID]] GT 0. THEN BEGIN
+    IF (FISHPREY[21, WAE[14, ID]] GT WAE[1, ID]) THEN BEGIN
+      FISHPREY[21, WAE[14, ID]] = WAE[1, ID]
+      FISHPREY[22, WAE[14, ID]] = WAE[2, ID]
+    ENDIF
+    IF (FISHPREY[21, WAE[14, ID]] LT WAE[1, ID]) THEN BEGIN
+      FISHPREY[21, WAE[14, ID]] = FISHPREY[21, WAE[14, ID]]
+      FISHPREY[22, WAE[14, ID]] = FISHPREY[22, WAE[14, ID]]
+    ENDIF   
+  ENDIF
+ENDFOR
+
+; NUMBER OF SUPERINDIVIDUALS
+FISHPREY[4, YP[14, *]] = FISHCellIDcount[0, YP[14, *]];  the number of superindividuals
+FISHPREY[9, EMS[14, *]] = FISHCellIDcount[1, EMS[14, *]];  the number of superindividuals
+FISHPREY[14, RAS[14, *]] = FISHCellIDcount[2, RAS[14, *]];  the number of superindividuals
+;FISHPREY[19, ROG[14, *]] = FISHCellIDcount[3, ROG[14, *]];  the number of superindividuals
+FISHPREY[24, WAE[14, *]] = FISHCellIDcount[4, WAE[14, *]];  the number of superindividuals
+
+FISHPREY[25, *] = TOTAL(FISHCellIDcount, 1); TOTAL NUMBER OF SUPERINDIVIDUALS IN A CELL
+FISHPREY[26, *] = FISHPREY[0, *] + FISHPREY[5, *] + FISHPREY[10, *] + FISHPREY[15, *] + FISHPREY[20, *]; TOTAL NUMBER OF INDIVIDUALS IN A CELL
+FISHPREY[27, *] = FISHPREY[3, *] + FISHPREY[8, *] + FISHPREY[13, *] + FISHPREY[18, *] + FISHPREY[23, *]; TOTAL BIOMASS IN A CELL
+
+;***********STILL NEED TO HANDLE LENGTH AND WEIGHT FOR DIFFERENT SUPERINDIVIDUALS IN THE SAME CELL*********************
+;YEPMultiSI = WHERE(FISH3DCellIDcount[0, YP[14, *]] GT 1., YEPMultiSIcount,complement = YEPOneSI, ncomplement = YEPOneSIcount)
+;FISHPREY2[1, YP[14, *]] = YP[1, *]
+
+;PRINT, MAX(TRANSPOSE(FISHPREY[4, *]))
+;YEPSI = WHERE(FISHPREY[4, WAE[14, *]] GT 0., YEPSICOUNT)
+;IF YEPSICOUNT GT 0. THEN YEPLENGTH SORT(YP[14, *]); SORT PROVIDES ORDERED SUBSCRIPTS FOR ALL ELEMENTS IN AN ARRAY.
+; FOR ID = 0L, nWAE DO BEGIN 
+; YEPSIloc = WHERE(WAE[14, ID] EQ YP[14, *], YEPPREYSICOUNT)
+; IF YEPPREYSICOUNT GT 0. THEN WAEprey[ID] = YP[14, YEPSIloc]
+
+;PRINT, FISHPREY
+;PRINT, FISH3DCellIDcount;[*, *] = 0.
+
+t_elapsed = SYSTIME(/seconds) - tstart
+PRINT, 'Elapesed time (seconds):', t_elapsed 
+PRINT, 'Elapesed time (minutes):', t_elapsed/60.
+PRINT, 'FISHPREY ENDS HERE'
+RETURN, FISHPREY
+END

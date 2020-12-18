@@ -1,0 +1,41 @@
+1D_recruit
+Makes recruitment (age-o survival) plots for each species.  Change value of "ff" to do a subset of species.
+
+1D_temp_DO_bigger
+Contour plots of DO and temperature inputs for June 1 - December 1.
+Must compile 'colorbar.pro' before this runs.
+
+1D_zoop_light
+Contour plots of light and zooplankton abundance.  It collects data for all time periods, but only plots one at a time.
+Just change the data to be plotted and figure title, highlight the plot, press shift+F8.
+Must compile 'colorbar.pro' before this runs.
+
+1Ddepth_heatmap
+Depth heatmaps for all species.
+Uses data from 1Dplot or 1dplot_longer and 'colorbar.pro' must be compiled before this runs.
+
+1Dplot
+Makes summary plots of population, average length, average weight, average biomass, and average depth for all species.
+Not modified to use with longer output.
+
+1Dplot_age class
+Makes age-class specific plot of average depth for one species.
+
+1Dplot_age_time
+Makes age-class and timing specific plots of depth for all species.
+Contains instructions for plotting the vertical movements of single superindividuals.
+
+1Dplot_diel_depth
+Average depth for one species at a given time of day.
+Not modified to use with longer output, REDUNDANT.
+
+1Dplot_limited
+Specific version of 1Dplot, can save time if just one specific graph is needed.
+Not modified to use with longer output.
+
+1Dplot_longer
+Same as 1Dplot, but modified for longer output.
+
+1Dplot_temp_DO
+Contour plots of DO and temperature inputs for June 1 - October 15.
+Must compile 'colorbar.pro' before this runs.
