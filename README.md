@@ -2,7 +2,7 @@
 A spatially explicit individual-based food web model for a large ecosystem
 
 ## Description 
-SEIBMFoodWeb is a spatially explicit individual-based model designed to simulate food web (including benthos, zooplankton, phytoplankton, forage fishes, and apex predatory fishes) dynamics in Lake Erie via individual-based processes including movement, foraging, growth, metabolism, maturation, reproduction, mortality, species interactions (competition, predation, etc.), and responses to environmental conditions.
+SEIBMFoodWeb is a spatially explicit individual-based model designed to simulate food web (including benthos, zooplankton, phytoplankton, forage fishes, and apex predatory fishes) dynamics in Lake Erie via individual-based processes including movement, foraging, growth, metabolism, maturation, reproduction, mortality, species interactions (competition, predation, etc.), and responses to environmental conditions (see [Hrycik et al. 2019](http://daisukegoto.weebly.com/uploads/2/5/3/1/25310060/hrycik_etal_2019.pdf) for an application of the modified version to simulate yellow perch vertical movement).
 
 ![alt text](https://github.com/dgoto2/SEIBMFoodWeb/blob/main/ecofore_main/SEIBMoutput/ibm1.jpg?raw=true)
 
